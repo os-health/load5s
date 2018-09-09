@@ -6,12 +6,12 @@
 #include <linux/kallsyms.h>
 #include <linux/version.h>
 
-#if LINUX_VERSION_CODE > KERNEL_VERSION(3, 14, 0)
-  #define  KP_OFFSET    0x204;
-#elif LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 39)
-  #define  KP_OFFSET    0xcf;
+#if LINUX_VERSION_CODE = KERNEL_VERSION(3, 10, 0)
+  #define  KP_OFFSET    0x24a;
+#elif LINUX_VERSION_CODE = KERNEL_VERSION(2, 6, 32)
+  #define  KP_OFFSET    0x24a;
 #else
-  #define  KP_OFFSET    0x1ca;
+  #define  KP_OFFSET    0x0;
 #endif
 
 static unsigned long load5s;
