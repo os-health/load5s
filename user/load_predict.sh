@@ -11,7 +11,11 @@ function calc_load(){
     load=$((load+10))
     predict_load=$(echo "scale=2;$load/2048" | bc)
     if [[ $load -lt 2048 ]];then
-        predict_load="0"$predict_load
+        if [[ "${predict_load}str" == "0str" ]];then
+            predict_load="0.0"$predict_load
+        else
+            predict_load="0"$predict_load
+        fi
     fi
 
     echo $predict_load
