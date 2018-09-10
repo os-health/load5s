@@ -11,7 +11,7 @@
 #elif LINUX_VERSION_CODE == KERNEL_VERSION(2, 6, 32)
   #define  KP_OFFSET    0x24a;
 #else
-  #define  KP_OFFSET    0x0;
+  #define  KP_OFFSET    0x24a;
 #endif
 
 static unsigned long load5s;
