@@ -15,6 +15,24 @@
 #endif
 
 static unsigned long load5s;
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 33)
+unsigned long symbol_addr = 0;
+
+static int symbol_walk_callback(void *data, const char *name, struct module *mod, unsigned long addr){
+    if (mod != 0) {
+        return 0;
+    }
+    if (strcmp(name, "calc_load_tasks") == 0) {
+        if (symbol_addr != 0) {
+            printk(KERN_INFO "Found two symbols in the kernel, unable to continue\n");
+            return -EFAULT;
+        }
+        symbol_addr = addr;
+    }
+    return 0;
+}
+#endif
  
 /***************************************
  *             kprobe part             * 
@@ -24,8 +42,18 @@ static struct kprobe kp = {};
  
 static int handler_pre(struct kprobe *p, struct pt_regs *regs)
 {
-    atomic_long_t *a = (atomic_long_t *)(long)kallsyms_lookup_name("calc_load_tasks");                  // 0xffffffff81dc4fa8;
-    load5s = atomic_long_read(a);
+    atomic_long_t *load5s_ptr;
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 33)
+    int ret = kallsyms_on_each_symbol(symbol_walk_callback, NULL);
+    if (ret){
+        printk("kallsyms_on_each_symbol is failed.\n");
+        return ret;
+    }
+    load5s_ptr = (atomic_long_t *)symbol_addr;
+#else
+    load5s_ptr = (atomic_long_t *)kallsyms_lookup_name("calc_load_tasks");                  // 0xffffffff81dc4fa8;
+#endif
+    load5s = atomic_long_read(load5s_ptr);
 
     return 0;
 }
@@ -40,7 +68,6 @@ static int handler_fault(struct kprobe *p, struct pt_regs *regs, int trapnr)
     printk(KERN_INFO "fault_handler: p->addr = 0x%p, trap #%dn", p->addr, trapnr);
     return 0;
 }
-
 
 /***************************************
  *              proc part              * 
