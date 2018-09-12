@@ -9,26 +9,25 @@
 #if LINUX_VERSION_CODE == KERNEL_VERSION(3, 10, 0)
   #define  KP_OFFSET    0x24a;
 #elif LINUX_VERSION_CODE == KERNEL_VERSION(2, 6, 32)
-  #define  KP_OFFSET    0x24a;
+  #define  KP_OFFSET    0xbb;
 #else
-  #define  KP_OFFSET    0x24a;
+  #define  KP_OFFSET    0x0;
 #endif
 
 static unsigned long load5s;
+static atomic_long_t *load5s_ptr = 0;
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 33)
-unsigned long symbol_addr = 0;
-
 static int symbol_walk_callback(void *data, const char *name, struct module *mod, unsigned long addr){
     if (mod != 0) {
         return 0;
     }
     if (strcmp(name, "calc_load_tasks") == 0) {
-        if (symbol_addr != 0) {
+        if (load5s_ptr != 0) {
             printk(KERN_INFO "Found two symbols in the kernel, unable to continue\n");
             return -EFAULT;
         }
-        symbol_addr = addr;
+        load5s_ptr = (atomic_long_t *)addr;
     }
     return 0;
 }
@@ -42,17 +41,7 @@ static struct kprobe kp = {};
  
 static int handler_pre(struct kprobe *p, struct pt_regs *regs)
 {
-    atomic_long_t *load5s_ptr;
-#if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 33)
-    int ret = kallsyms_on_each_symbol(symbol_walk_callback, NULL);
-    if (ret){
-        printk("kallsyms_on_each_symbol is failed.\n");
-        return ret;
-    }
-    load5s_ptr = (atomic_long_t *)symbol_addr;
-#else
-    load5s_ptr = (atomic_long_t *)kallsyms_lookup_name("calc_load_tasks");                  // 0xffffffff81dc4fa8;
-#endif
+    printk("load5s_ptr is %p \n",load5s_ptr);
     load5s = atomic_long_read(load5s_ptr);
 
     return 0;
@@ -111,8 +100,17 @@ static int __init load5s_init(void)
         return ret;
     }
     printk(KERN_INFO "Planted kprobe at %p\n", kp.addr);
-    
 
+#if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 32)
+    load5s_ptr = (atomic_long_t *)kallsyms_lookup_name("calc_load_tasks");
+#else
+    ret = kallsyms_on_each_symbol(symbol_walk_callback, NULL);
+    if (ret){
+        printk("kallsyms_on_each_symbol is failed.\n");
+        return ret;
+    }
+#endif
+    
     return 0;
 }
  
