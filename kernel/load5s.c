@@ -7,7 +7,7 @@
 #include <linux/version.h>
 
 #if LINUX_VERSION_CODE == KERNEL_VERSION(3, 10, 0)
-  #define  KP_OFFSET    0x24a;
+  #define  KP_OFFSET    0x105;
 #elif LINUX_VERSION_CODE == KERNEL_VERSION(2, 6, 32)
   #define  KP_OFFSET    0xbb;
 #else
@@ -41,7 +41,6 @@ static struct kprobe kp = {};
  
 static int handler_pre(struct kprobe *p, struct pt_regs *regs)
 {
-    printk("load5s_ptr is %p \n",load5s_ptr);
     load5s = atomic_long_read(load5s_ptr);
 
     return 0;
