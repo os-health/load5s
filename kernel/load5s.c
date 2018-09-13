@@ -9,7 +9,7 @@
 #if LINUX_VERSION_CODE == KERNEL_VERSION(3, 10, 0)
   #define  KP_OFFSET    0x105;
 #elif LINUX_VERSION_CODE == KERNEL_VERSION(2, 6, 32)
-  #define  KP_OFFSET    0xbb;
+  #define  KP_OFFSET    0x5f;
 #else
   #define  KP_OFFSET    0x0;
 #endif
