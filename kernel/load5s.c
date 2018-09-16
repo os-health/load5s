@@ -7,14 +7,14 @@
 #include <linux/version.h>
 
 #if LINUX_VERSION_CODE == KERNEL_VERSION(3, 10, 0)
-  #define  KP_OFFSET    0x105;
+  #define  KP_OFFSET    0x23d;
 #elif LINUX_VERSION_CODE == KERNEL_VERSION(2, 6, 32)
   #define  KP_OFFSET    0x5f;
 #else
   #define  KP_OFFSET    0x0;
 #endif
 
-static unsigned long load5s;
+static unsigned long load5s = 0;
 static atomic_long_t *load5s_ptr = 0;
 
 #if LINUX_VERSION_CODE < KERNEL_VERSION(2, 6, 33)
