@@ -9,7 +9,7 @@ function calc_load(){
     load=$((load+1024))
     load=$((load/2048))
     load=$((load+10))
-    predict_load=$(echo "scale=2;$load/2048" | bc)
+    predict_load=$(awk -v x=$load -v y=2048 'BEGIN{printf "%.02f",x/y}')
     if [[ $load -lt 2048 ]];then
         if [[ "${predict_load}str" == "0str" ]];then
             predict_load="0.0"$predict_load
@@ -32,9 +32,9 @@ last_load=$(cat /proc/loadavg)
 last_load1=$(echo $last_load | awk '{print $1}')
 last_load5=$(echo $last_load | awk '{print $2}')
 last_load15=$(echo $last_load | awk '{print $3}')
-last_load1_long=$(expr 2048*$last_load1/1  | bc)
-last_load5_long=$(expr 2048*$last_load5/1  | bc)
-last_load15_long=$(expr 2048*$last_load15/1  | bc)
+last_load1_long=$(awk -v x=2048 -v y=$last_load1 'BEGIN{printf "%.0f",x*y}')
+last_load5_long=$(awk -v x=2048 -v y=$last_load5 'BEGIN{printf "%.0f",x*y}')
+last_load15_long=$(awk -v x=2048 -v y=$last_load15 'BEGIN{printf "%.0f",x*y}')
 
 usleep 5001000
 
@@ -59,4 +59,3 @@ tabs=$tabs"load5: $last_load5 $current_load5 $predict_load5 \n"
 tabs=$tabs"load15: $last_load15 $current_load15 $predict_load15 \n"
 echo -e "$tabs" | column -t 
 echo -e "\nload5s is: "$calc_load_tasks_counter
-
