@@ -10,13 +10,6 @@ function calc_load(){
     load=$((load/2048))
     load=$((load+10))
     predict_load=$(awk -v x=$load -v y=2048 'BEGIN{printf "%.02f",x/y}')
-    if [[ $load -lt 2048 ]];then
-        if [[ "${predict_load}str" == "0str" ]];then
-            predict_load="0.0"$predict_load
-        else
-            predict_load="0"$predict_load
-        fi
-    fi
 
     echo $predict_load
 }
