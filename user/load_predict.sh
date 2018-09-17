@@ -45,10 +45,10 @@ predict_load5=$(calc_load $last_load5_long 2014 $active)
 predict_load15=$(calc_load $last_load15_long 2037 $active)
 
 # result 
+echo -e "load5s is: "$calc_load_tasks_counter
 tabs=""
 tabs=$tabs"1/5/15 last_load current_load predict_load \n"
 tabs=$tabs"load1: $last_load1 $current_load1 $predict_load1 \n"
 tabs=$tabs"load5: $last_load5 $current_load5 $predict_load5 \n"
 tabs=$tabs"load15: $last_load15 $current_load15 $predict_load15 \n"
 echo -e "$tabs" | column -t 
-echo -e "\nload5s is: "$calc_load_tasks_counter
