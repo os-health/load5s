@@ -1,6 +1,7 @@
-# load5s
+## load5s
 this is load5s ko.
 
+```
 mkdir os-health
 cd os-health
 yum install git -y 
@@ -16,3 +17,4 @@ gcc uninterruptible.c -o uninterruptible
 nohup ./simulate_load.sh >/dev/null 2>&1 &
 # sleep > 5s
 ./load_predict.sh 
+```
